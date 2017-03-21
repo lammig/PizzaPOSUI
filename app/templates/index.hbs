@@ -40,7 +40,7 @@
 								<div class="col-md-12 no-padding">					
 									<ul class="list-group">
 										{{#each model.order.lineItems as |lineItem|}}
-										<li class="list-group-item">{{lineItem.qty}} {{lineItem.item.name}} <span class="badge">{{lineItem.extendedPrice}}</span></li>										
+										<li {{action "itemSelected" lineItem.item.id}} class='list-group-item {{lineItem.cssValue}}'>{{lineItem.qty}} {{lineItem.item.name}} <span class="badge">{{lineItem.extendedPrice}}</span></li>										
 										{{/each}}
 									
 										<li class="list-group-item">&nbsp;</li>
@@ -52,7 +52,7 @@
 							</div>
 							<div class="row top-buffer">
 								<div class="col-md-6 no-padding">
-									<input class="btn btn-secondary btn-sm" type="submit" name="no-thanks" value='Void' {{action 'noThanks'}} />								
+									<input class="btn btn-secondary btn-sm" type="submit" name="void-line-item" value='Void' {{action 'voidLineItem'}} />								
 								</div>
 								<div class="col-md-6 no-padding">
 									<input class="btn btn-secondary btn-sm" type="submit" name="submit-order" value='Pay Now' {{action 'submitOrder'}} />								
