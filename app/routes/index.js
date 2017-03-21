@@ -2,14 +2,20 @@ import Ember from 'ember';
 
 export default Ember.Route.extend({
 	
+	order: null,
+	items: null,
+	
 	model() {
 				
 		// THIS IS THE FIND ALL CALL (GET)
-		this.get('store').findAll('item').then(function(items) {
-			items.forEach(function(item) {
-				console.log("item = " + item.get('name') + "   " + item.get('price'));
-			});
-		});
+		// this.get('store').findAll('item').then(function(items) {
+		// 	items.forEach(function(item) {
+		// 		console.log("item = " + item.get('name') + "   " + item.get('price'));
+		// 	});
+		// });
+		console.log("model() was called");
+		this.set('items', this.get('store').findAll('item'));		
+		return this;
 
 		// THIS IS THE GET SINGLE CALL (GET)
 		// this.get('store').findRecord('item', 1).then(function(item) {
@@ -68,5 +74,112 @@ export default Ember.Route.extend({
 		}); */
 
 
+	},
+	
+	actions: {		
+		
+		newOrder: function() {
+			console.log("Current order = " + this.get('order'));
+			
+			var self = this;
+			
+			var result = [];
+			var request = new Ember.RSVP.Promise(function (resolve, reject) {
+			  Ember.$.ajax({
+			    type: 'GET',
+			    url: 'http://localhost:8080/order/create',
+			    success: function (data) {
+			      resolve(data.order);
+			    },
+			    error: function (request, textStatus, error) {
+			      console.log(error);
+			      reject(error);
+			    }
+			  });
+			});		
+			
+			request.then(function(order) {
+				console.log("Received orderId = " + order.orderId);
+				self.set('order', order);
+			}, function(error) {
+			  // handle error (show error message, retry, etc.)
+			});
+		},
+		
+		addItem: function(itemId) {
+			console.log("Got itemId = " + itemId);
+			
+			var currentOrder = this.get('order');
+						
+			if (currentOrder !== null) {
+				var self = this;
+						
+				var parsedItemId = parseInt(itemId, 10);
+				var url = 'http://localhost:8080/order/' + currentOrder.orderId + '/addItem/' + itemId;
+				
+				var lineItems = currentOrder.lineItems;
+				for (var i = 0; i < lineItems.length; i++) {
+				    if (lineItems[i].item.id === parsedItemId) {
+						// /order/{orderId}/changeQty/{itemId}/{qty}
+						var newQty = lineItems[i].qty + 1;
+				    	url = 'http://localhost:8080/order/' + currentOrder.orderId + '/changeQty/' + itemId + '/' + newQty;
+						break;
+				    }
+				}
+			
+				var result = [];
+				var request = new Ember.RSVP.Promise(function (resolve, reject) {
+				  Ember.$.ajax({
+				    type: 'GET',
+					url: url,
+				    success: function (data) {
+				      resolve(data.order);
+				    },
+				    error: function (request, textStatus, error) {
+				      console.log(error);
+				      reject(error);
+				    }
+				  });
+				});		
+			
+				request.then(function(order) {
+					console.log("Received orderId = " + order.orderId);
+					self.set('order', order);
+				}, function(error) {
+				  // handle error (show error message, retry, etc.)
+				});		
+			}	
+		},
+		
+		submitOrder: function() {
+			var currentOrder = this.get('order');
+			// /order/{orderId}/addItem/{itemId}
+			if (currentOrder !== null) {
+				var self = this;
+			
+				var result = [];
+				var request = new Ember.RSVP.Promise(function (resolve, reject) {
+				  Ember.$.ajax({
+				    type: 'GET',
+				    url: 'http://localhost:8080/order/' + currentOrder.orderId + '/submit',
+				    success: function (data) {
+				      resolve(data.order);
+				    },
+				    error: function (request, textStatus, error) {
+				      console.log(error);
+				      reject(error);
+				    }
+				  });
+				});		
+			
+				request.then(function(order) {
+					console.log("Received orderId = " + order.orderId);
+					self.set('order', order);
+					//debugger;
+				}, function(error) {
+				  // handle error (show error message, retry, etc.)
+				});				
+			}		
+		}
 	}
 });

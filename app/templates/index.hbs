@@ -1,1 +1,68 @@
-{{outlet}}
+<form id="ereceipt-signup-form" name="ereceipt-signup">
+	<div class="container-fluid">
+		<div class="pull-left" style="width:100px"></div>
+		<div class="pull-right" style="width:100px"></div>
+		<div style="margin-left:100px;margin-right:100px">
+	
+			<div class="row top-buffer">
+				<div class="col-md-10">
+					<h1>PizzaPOS</h1>
+				</div>	
+				<div class="col-md-2">
+					<input class="btn btn-secondary btn-sm" type="submit" name="new-order" value='Orders' {{action 'newOrder'}} />					
+				</div>					
+			</div>
+			
+			<div class="container-fluid">
+			
+				<div class="row">
+					<div class="col-md-8">				
+						<div class="container-fluid">
+							<div class="row"> <!-- Blah -->
+							
+								<div class="btn-group btn-matrix btn-group-xs">
+									{{#each model.items as |item index|}}
+										<input type="submit" class="btn btn-default btn-break" value={{item.name}} {{action 'addItem' item.id}}>
+									{{/each}}
+								</div>							
+							</div> <!-- Blah -->		
+																							
+						</div>
+					</div> <!-- Left side -->
+					<div class="col-md-4">					
+						<div class="container-fluid">
+							<div class="row"> 
+								<div class="col-md-12 no-padding">
+									<h5>Order Number: {{model.order.orderNumber}}</h5>
+								</div>
+							</div>
+							<div class="row"> 
+								<div class="col-md-12 no-padding">					
+									<ul class="list-group">
+										{{#each model.order.lineItems as |lineItem|}}
+										<li class="list-group-item">{{lineItem.qty}} {{lineItem.item.name}} <span class="badge">{{lineItem.extendedPrice}}</span></li>										
+										{{/each}}
+									
+										<li class="list-group-item">&nbsp;</li>
+										<li class="list-group-item">Sub-Total <span class="badge">{{model.order.subTotal}}</span></li>
+										<li class="list-group-item">Tax <span class="badge">{{model.order.taxTotal}}</span></li>
+										<li class="list-group-item">Total <span class="badge">{{model.order.grandTotal}}</span></li> 
+									</ul>
+								</div>
+							</div>
+							<div class="row top-buffer">
+								<div class="col-md-6 no-padding">
+									<input class="btn btn-secondary btn-sm" type="submit" name="no-thanks" value='Void' {{action 'noThanks'}} />								
+								</div>
+								<div class="col-md-6 no-padding">
+									<input class="btn btn-secondary btn-sm" type="submit" name="submit-order" value='Pay Now' {{action 'submitOrder'}} />								
+								</div>								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> <!-- second container -->
+		</div>
+	</div>
+</form>
+
